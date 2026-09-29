@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>Controle Financeiro</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#172033;font-family:Arial,sans-serif}
+header{background:#2563eb;color:#fff;padding:18px 14px;text-align:center}
+header h1{margin:0;font-size:22px}header p{margin:5px 0 0;font-size:13px}
+nav{display:flex;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:5}
+nav button{flex:1;border:0;background:#fff;padding:14px 6px;font-weight:bold;font-size:14px;color:#475569}
+nav button.active{color:#2563eb;border-bottom:3px solid #2563eb}
+main{max-width:1000px;margin:auto;padding:14px}.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:14px;padding:15px;margin-bottom:14px;box-shadow:0 2px 10px #0001}
+h2{font-size:19px;margin:3px 0 15px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.wide{grid-column:1/-1}label{font-size:12px;font-weight:bold;display:block;margin-bottom:5px}
+input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font-size:16px;background:#fff}
+button{cursor:pointer}.primary{border:0;background:#2563eb;color:white;border-radius:9px;padding:12px 16px;font-weight:bold}
+.secondary{border:0;background:#e8eef7;color:#172033;border-radius:9px;padding:10px 13px;font-weight:bold}
+.danger{border:0;background:#fee2e2;color:#b91c1c;border-radius:9px;padding:9px 11px;font-weight:bold}
+.actions{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.box{background:#fff;border-radius:12px;padding:13px;box-shadow:0 2px 8px #0001}.box small{display:block;color:#64748b}.box strong{display:block;font-size:20px;margin-top:4px}
+.search{margin-bottom:12px}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:10px 8px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:13px}th{background:#f8fafc}
+.num{text-align:right}.empty{text-align:center;color:#64748b;padding:25px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.summary{grid-template-columns:1fr}header{padding-top:15px}}
+</style>
+</head>
+<body>
+<header><h1>Controle Financeiro</h1><p>Itens, receitas e despesas em um só lugar</p></header>
+<nav>
+<button id="tabItens" class="active" onclick="showPage('itens')">📦 Itens</button>
+<button id="tabFin" onclick="showPage('financeiro')">💰 Controle Financeiro</button>
+</nav>
+
+<main>
+<section id="itens" class="page active">
+<div class="card">
+<h2>Novo item</h2>
+<form id="itemForm">
+<div class="grid">
+<div class="wide"><label>Produto</label><input id="produto" required></div>
+<div><label>Quantidade</label><input id="quantidade" type="number" min="0" step="0.01" required></div>
+<div><label>Valor unitário (R$)</label><input id="unitario" type="number" min="0" step="0.01" required></div>
+<div><label>Data</label><input id="dataItem" type="date" required></div>
+<div class="wide"><label>Local</label><input id="local"></div>
+</div>
+<div class="actions"><button class="primary">Adicionar item</button></div>
+</form>
+</div>
+<div class="summary">
+<div class="box"><small>Total dos itens</small><strong id="totalItens">R$ 0,00</strong></div>
+<div class="box"><small>Registros</small><strong id="qtdItens">0</strong></div>
+</div>
+<div class="card">
+<label>Pesquisar nos itens</label><input id="buscaItens" class="search" placeholder="Produto, quantidade, valor, data ou local">
+<div class="tablewrap"><table><thead><tr><th>Data</th><th>Produto</th><th>Qtd.</th><th>Unitário</th><th>Total</th><th>Local</th><th></th></tr></thead><tbody id="listaItens"></tbody></table></div>
+</div>
+</section>
+
+<section id="financeiro" class="page">
+<div class="summary">
+<div class="box"><small>Receitas</small><strong id="totalReceitas">R$ 0,00</strong></div>
+<div class="box"><small>Despesas</small><strong id="totalDespesas">R$ 0,00</strong></div>
+<div class="box"><small>Saldo</small><strong id="saldo">R$ 0,00</strong></div>
+</div>
+
+<div class="card">
+<h2>➕ Receitas</h2>
+<form id="receitaForm">
+<div class="grid"><div class="wide"><label>Fonte</label><input id="fonte" required></div><div><label>Valor (R$)</label><input id="valorReceita" type="number" min="0" step="0.01" required></div><div><label>Data</label><input id="dataReceita" type="date" required></div></div>
+<div class="actions"><button class="primary">Adicionar receita</button></div>
+</form>
+<div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>Data</th><th>Fonte</th><th>Valor</th><th></th></tr></thead><tbody id="listaReceitas"></tbody></table></div>
+</div>
+
+<div class="card">
+<h2>➖ Despesas</h2>
+<form id="despesaForm">
+<div class="grid"><div class="wide"><label>Tipo de pagamento</label><input id="tipoPagamento" required placeholder="Pix, dinheiro, cartão..."></div><div><label>Valor (R$)</label><input id="valorDespesa" type="number" min="0" step="0.01" required></div><div><label>Data</label><input id="dataDespesa" type="date" required></div></div>
+<div class="actions"><button class="primary">Adicionar despesa</button></div>
+</form>
+<div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>Data</th><th>Pagamento</th><th>Valor</th><th></th></tr></thead><tbody id="listaDespesas"></tbody></table></div>
+</div>
+</section>
+</main>
+
+<script>
+const K='controle_financeiro_v3';
+let db=JSON.parse(localStorage.getItem(K)||'{"itens":[],"receitas":[],"despesas":[]}');
+const $=x=>document.getElementById(x);
+const money=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0);
+const dateNow=()=>new Date().toISOString().slice(0,10);
+$('dataItem').value=dateNow();$('dataReceita').value=dateNow();$('dataDespesa').value=dateNow();
+function persist(){localStorage.setItem(K,JSON.stringify(db));render();}
+function showPage(p){
+ $('itens').classList.toggle('active',p==='itens');$('financeiro').classList.toggle('active',p==='financeiro');
+ $('tabItens').classList.toggle('active',p==='itens');$('tabFin').classList.toggle('active',p==='financeiro');
+}
+$('itemForm').onsubmit=e=>{e.preventDefault();db.itens.push({id:Date.now(),produto:$('produto').value.trim(),q:+$('quantidade').value,u:+$('unitario').value,data:$('dataItem').value,local:$('local').value.trim()});e.target.reset();$('dataItem').value=dateNow();persist()};
+$('receitaForm').onsubmit=e=>{e.preventDefault();db.receitas.push({id:Date.now(),fonte:$('fonte').value.trim(),valor:+$('valorReceita').value,data:$('dataReceita').value});e.target.reset();$('dataReceita').value=dateNow();persist()};
+$('despesaForm').onsubmit=e=>{e.preventDefault();db.despesas.push({id:Date.now(),tipo:$('tipoPagamento').value.trim(),valor:+$('valorDespesa').value,data:$('dataDespesa').value});e.target.reset();$('dataDespesa').value=dateNow();persist()};
+function del(t,id){db[t]=db[t].filter(x=>x.id!==id);persist()}
+$('buscaItens').oninput=render;
+function brdate(d){return new Date(d+'T00:00:00').toLocaleDateString('pt-BR')}
+function render(){
+ let q=$('buscaItens').value.toLowerCase();
+ let itens=db.itens.filter(i=>[i.produto,i.q,i.u,i.q*i.u,i.data,brdate(i.data),i.local,money(i.u),money(i.q*i.u)].some(v=>String(v).toLowerCase().includes(q))).sort((a,b)=>a.data.localeCompare(b.data));
+ $('listaItens').innerHTML=itens.length?itens.map(i=>`<tr><td>${brdate(i.data)}</td><td>${esc(i.produto)}</td><td class=num>${i.q}</td><td class=num>${money(i.u)}</td><td class=num><b>${money(i.q*i.u)}</b></td><td>${esc(i.local)}</td><td><button class=danger onclick="del('itens',${i.id})">Excluir</button></td></tr>`).join(''):'<tr><td colspan=7 class=empty>Nenhum item.</td></tr>';
+ $('totalItens').textContent=money(db.itens.reduce((s,i)=>s+i.q*i.u,0));$('qtdItens').textContent=db.itens.length;
+ let rec=[...db.receitas].sort((a,b)=>a.data.localeCompare(b.data));$('listaReceitas').innerHTML=rec.length?rec.map(i=>`<tr><td>${brdate(i.data)}</td><td>${esc(i.fonte)}</td><td class=num>${money(i.valor)}</td><td><button class=danger onclick="del('receitas',${i.id})">Excluir</button></td></tr>`).join(''):'<tr><td colspan=4 class=empty>Nenhuma receita.</td></tr>';
+ let des=[...db.despesas].sort((a,b)=>a.data.localeCompare(b.data));$('listaDespesas').innerHTML=des.length?des.map(i=>`<tr><td>${brdate(i.data)}</td><td>${esc(i.tipo)}</td><td class=num>${money(i.valor)}</td><td><button class=danger onclick="del('despesas',${i.id})">Excluir</button></td></tr>`).join(''):'<tr><td colspan=4 class=empty>Nenhuma despesa.</td></tr>';
+ let r=db.receitas.reduce((s,i)=>s+i.valor,0),d=db.despesas.reduce((s,i)=>s+i.valor,0);$('totalReceitas').textContent=money(r);$('totalDespesas').textContent=money(d);$('saldo').textContent=money(r-d);
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+render();
+</script>
+</body></html>
